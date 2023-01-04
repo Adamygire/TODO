@@ -15,8 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+#from todo_list import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('todo_list.urls')),
+    path('api/v1/', include('todo_list.api.urls', namespace='api')),
+
+    #Todos
+    #path('', views.current_todos, name='home'),
+    #path('current/', views.current_todos, name='currenttodos'),
 ]

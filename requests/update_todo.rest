@@ -1,0 +1,8 @@
+PUT http://127.0.0.1:8000/api/v1/todos/7/
+content-type: application/json
+
+{
+    "name": "Sample no. 3",
+    "description": "updated with REST Client",
+    "status": "OnGoing"
+}

@@ -1,0 +1,8 @@
+POST http://127.0.0.1:8000/api/v1/todos/
+content-type: application/json
+
+{
+    "name": "sample no. 1",
+    "description": "created with REST Client",
+    "status": "NotStarted"
+}

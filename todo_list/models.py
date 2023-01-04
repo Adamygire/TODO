@@ -1,5 +1,8 @@
+from django.utils import timezone
 from django.db import models
-from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.translation import gettext_lazy as _
+from .managers import CustomUserManager
 
 class List(models.Model):
     item = models.CharField(max_length=200)
@@ -8,25 +11,37 @@ class List(models.Model):
     def __str__(self):
         return self.item +' | '+ str(self.completed)
 
+class User(AbstractBaseUser, PermissionsMixin):
+    username = None
+    email = models.EmailField(unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(default=timezone.now)
+    updated = models.DateTimeField(default=timezone.now)
 
-class User(models.Model):
-    django_user = models.OneToOneField(DjangoUser, on_delete=models.CASCADE)
-    created = models.DateTimeField(blank=False) #  timestamp: When the item is created
-    updated = models.DateTimeField(blank=False) #  timestamp: When the item is last updated
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.email
 
 
+class StatusType(models.TextChoices):
+    NOTSTARTED = 'NotStarted', _('NotStarted')
+    ONGOING    = 'OnGoing', _('OnGoing')
+    COMPLETED  = 'Completed', _('Completed')
+
+
 class Todo(models.Model):
     name = models.CharField(blank=False, max_length=200)
     description = models.CharField(blank=True, max_length=200)
-    # user id: Id of the user who owns this todo item
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    StatusType = models.TextChoices('NotStarted', 'OnGoing', 'Completed')
-    status = models.CharField(blank=False, choices=StatusType.choices, max_length=10) # An enum of either: NotStarted, OnGoing, Completed
-    created = models.DateTimeField(blank=False) #  timestamp: When the item is created
-    updated = models.DateTimeField(blank=False) #  timestamp: When the item is last updated
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(blank=False, default=StatusType.NOTSTARTED, choices=StatusType.choices, max_length=10)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
